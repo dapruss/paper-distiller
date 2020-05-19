@@ -10,21 +10,17 @@ import re
     Requires Java install and Java in PATH variable.
 '''
 
-#TODO how does this handle latex pdfs?
-#TODO why do some words get glued together - is it the Tika parser or something I'm doing?
-
 
 def distill_file(fileName, journalName):
     """
       This function opens the specified pdf file and prints (to the console) the distilled version of
       the text, i.e., without the superfluous information at the top and bottom of pages, without
       citations, without the content before the abstract, and without references. The output text
-      can then be read with the audio reader of your choice (I paste it into Word and use its built in
-      'read aloud' feature, which isn't ideal but gets the job done).
-      @type fileName: string
-      @param fileName: name of the pdf file to distill (e.g., "du_bois_democratic_defence_of_the_value_free_ideal_off_print.pdf").
-      @type journalName: string
-      @param journalName: name of the article's journal name (e.g., "Synthese").
+      can then be read with the audio reader of your choice, e.g. Word.
+      Parameters:
+        fileName (string): name of the pdf file to distill
+            (e.g., "du_bois_democratic_defence_of_the_value_free_ideal_off_print.pdf").
+        journalName (string): name of the article's journal name (e.g., "Synthese").
     """
 
     #Words that, if they fully make up a line, indicate the line has no content and should be skipped
@@ -38,7 +34,7 @@ def distill_file(fileName, journalName):
     outputText = ""
 
     # Get raw data using tika parser. 'raw' contains a dictionary with the content (text)
-    # and the metadata (info like author name, year, etc.)
+    #   and the metadata (info like author name, year, etc.)
     raw = parser.from_file(fileName)
     fileContents = "" + raw['content']
     metadata = raw['metadata']
@@ -94,12 +90,12 @@ def distill_file(fileName, journalName):
                     outputText = outputText[:-1]
                     multipleNewLines = True
                 #If there's no asterisk flag and no previous newline, append a newline and mark that we've
-                # seen a white space line.
+                #   seen a white space line.
                 elif not multipleNewLines and outputText[len(outputText)-1] != '\n':
                     outputText += '\n'
                     multipleNewLines = True
                 #If we've seen a whitespace line already and we've appended a newline, that means
-                #it was appended by mistake, so the previous whitespace line should be stripped
+                #   it was appended by mistake, so the previous whitespace line should be stripped
                 elif multipleNewLines and outputText[len(outputText)-1] == '\n' \
                         and not outputText.rstrip().endswith('.'):
                     outputText = outputText[:-1]
@@ -112,12 +108,17 @@ def distill_file(fileName, journalName):
             outputText += line
         loopCount += 1
 
-    #Get rid of citations in final result
-    # (it's easier to do this at the end because sometimes citations span multiple lines)
+    #Get rid of citations in final result (it's easier to do this at the end because
+    #   sometimes citations span multiple lines)
     outputText = stripParentheticalCitations(outputText)
     print(outputText)
 
     #f.write(outputText)
+
+
+#TODO how does this handle latex pdfs?
+#TODO why do some words get glued together - is it the Tika parser or something I'm doing?
+
 
 def cleanUp(line, stopwords):
     """
@@ -192,7 +193,9 @@ def stripParentheticalCitations(line):
     return re.sub("\s*\(([^\)]*)(\d{4})[^\)]*\)", "", line)
 
 
-#TODO: special characters causing issues. Better solution? http://stackoverflow.com/questions/5419/python-unicode-and-the-windows-console/32176732#32176732 ; http://stackoverflow.com/questions/878972/windows-cmd-encoding-change-causes-python-crash/3259271
+#TODO: special characters causing issues. Better solution?
+# http://stackoverflow.com/questions/5419/python-unicode-and-the-windows-console/32176732#32176732 ;
+# http://stackoverflow.com/questions/878972/windows-cmd-encoding-change-causes-python-crash/3259271
 # try:
 #     f.write(value.lower() + '\n')
 # except UnicodeEncodeError:
