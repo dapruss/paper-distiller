@@ -119,6 +119,7 @@ def distill_file(fileName, journalName):
 #TODO how does this handle latex pdfs?
 #TODO why do some words get glued together - is it the Tika parser or something I'm doing?
 
+#test
 
 def cleanUp(line, stopwords):
     """
